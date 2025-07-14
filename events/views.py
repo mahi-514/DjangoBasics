@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.utils.timezone import now
 from .models import Event
 from django.contrib.auth.models import User
+from .tasks import send_event_reminder
 
 @login_required
 def event_list(request):
@@ -25,6 +26,7 @@ def event_create(request):
         event.user = request.user
         event.save()
         return redirect('event_list')
+    send_event_reminder.delay()
     return render(request, 'events/event_form.html', {'form': form})
 
 @login_required
